@@ -1,4 +1,7 @@
 # Azure IoT Central Device Bridge
+
+NOTE: This repository is a fork of https://github.com/Azure/iotc-device-bridge to allow for the bridge to be deployed as a standalone Node.js app instead of an Azure Function w/ dependencies on Azure KeyVault, etc. It also supports scenarios where incoming HTTP messages can be routed to devices that may be provisioned in different DPS instances.
+
 This repository contains everything you need create a device bridge to connect other IoT clouds such as Sigfox, Particle, and The Things Network (TTN) to IoT Central. The device bridge forwards the messages your devices send to other clouds to your IoT Central app. In your IoT Central app, you can build rules and run analytics on that data, create workflows in Microsoft Flow and Azure Logic apps, export that data, and much more. This solution will provision several Azure resources into your Azure subscription that work together to transform and forward device messages through a webhook integration in Azure Functions.
 
 To use the device bridge solution, you will need the following:

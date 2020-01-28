@@ -47,6 +47,15 @@ app.post('/', async (req, res) => {
         res.status(e.statusCode ? e.statusCode : 500).send(e.message);
     }
 })
+
+app.get('/deviceEnrollments', async (req, res) => {
+    res.status(200).send(DEVICE_ENROLLMENTS_MAP);
+})
+
+app.post('/deviceEnrollments', async (req, res) => {
+    Object.assign(DEVICE_ENROLLMENTS_MAP, req.body);
+    res.status(200).end();
+})
   
 app.listen(3000, function () {
     console.log('Example app listening on port 3000!')

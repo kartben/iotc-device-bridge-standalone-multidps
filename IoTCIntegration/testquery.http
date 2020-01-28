@@ -1,5 +1,5 @@
 POST http://localhost:3000
-content-type: application/json
+Content-Type: application/json
 
 {
     "device": {
@@ -8,5 +8,22 @@ content-type: application/json
     "measurements": {
         "temperature": 22.31,
         "humidity": 18.5
+    }
+}
+
+###
+
+GET http://localhost:3000/deviceEnrollments
+
+###
+
+POST http://localhost:3000/deviceEnrollments
+Content-Type: application/json
+
+{
+    "deviceXXX": {
+        "idScope": "0ne000B9296",
+        "primaryKey": "eVZTSWyO8th6hM4FyPQcobZEb6TYwob1Stwnhg5UIq1ldx8wwnJChbSPxq9c/yW1THz9ksXOJUKhDgkOMXR6uA==",
+        "capabilityModelId": "urn:seeedstudio:sensecap:1"
     }
 }

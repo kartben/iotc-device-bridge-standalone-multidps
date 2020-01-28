@@ -1,0 +1,14 @@
+POST http://localhost:3000
+content-type: application/json
+
+{
+    "device": {
+        "deviceId": "device020"
+    },
+    "measurements": {
+        "temp": 20.31,
+        "pressure": 50,
+        "humidity": 8.5,
+        "ledColor": "blue"
+    }
+}

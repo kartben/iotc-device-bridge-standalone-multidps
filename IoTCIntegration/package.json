@@ -5,8 +5,12 @@
   "description": "Sample Azure Function for cloud to cloud integration with Azure IoT Central",
   "main": "index.js",
   "dependencies": {
-    "azure-iot-device": "^1.7.4",
-    "azure-iot-device-http": "^1.7.4",
+    "azure-iot-device": "1.12.0-preview.2",
+    "azure-iot-device-http": "1.12.0-preview.2",
+    "azure-iot-provisioning-device": "^1.7.2",
+    "azure-iot-provisioning-device-mqtt": "^1.6.2",
+    "azure-iot-security-symmetric-key": "^1.6.2",
+    "express": "^4.17.1",
     "request": "^2.88.0",
     "request-promise-native": "^1.0.5"
   },

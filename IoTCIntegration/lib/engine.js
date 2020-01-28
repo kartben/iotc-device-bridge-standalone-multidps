@@ -4,14 +4,18 @@
  */
 
 const crypto = require('crypto');
-const request = require('request-promise-native');
 const Device = require('azure-iot-device');
-const DeviceTransport = require('azure-iot-device-http');
+const DeviceTransport = require('azure-iot-device-mqtt');
 const util = require('util');
 
 var ProvisioningTransport = require('azure-iot-provisioning-device-mqtt').Mqtt;
 var SymmetricKeySecurityClient = require('azure-iot-security-symmetric-key').SymmetricKeySecurityClient;
 var ProvisioningDeviceClient = require('azure-iot-provisioning-device').ProvisioningDeviceClient;
+
+const DigitalTwinClient = require('azure-iot-digitaltwins-device').DigitalTwinClient;
+const DeviceInformation = require('./deviceInformation').DeviceInformation;
+const THSensor = require('./thsensor').THSensor;
+
 
 const StatusError = require('../error').StatusError;
 
@@ -42,19 +46,39 @@ module.exports = async function (context, device, measurements, timestamp) {
         throw new StatusError('Invalid format: if present, timestamp must be in ISO format (e.g., YYYY-MM-DDTHH:mm:ss.sssZ)', 400);
     }
 
-    const client = Device.Client.fromConnectionString(await getDeviceConnectionString(context, device), DeviceTransport.Http);
+    const client = Device.Client.fromConnectionString(await getDeviceConnectionString(context, device), DeviceTransport.Mqtt);
+
+   
 
     try {
-        const message = new Device.Message(JSON.stringify(measurements));
+         // if PnP device 
+        if(context.deviceEnrollments[device.deviceId].capabilityModelId) {
+            const digitalTwinClient = new DigitalTwinClient(context.deviceEnrollments[device.deviceId].capabilityModelId, client);
+            const thSensor = new THSensor('thsensor');
+            const deviceInformation = new DeviceInformation('deviceInformation');
 
-        if (timestamp) {
-            message.properties.add('iothub-creation-time-utc', timestamp);
+            digitalTwinClient.addInterfaceInstance(deviceInformation);
+            digitalTwinClient.addInterfaceInstance(thSensor);
+
+            await digitalTwinClient.register();
+
+            thSensor.temperature.send(measurements.temperature);
+            thSensor.humidity.send(measurements.humidity);
+
+        } else {
+            // send as good ol' IoT Hub telemetry
+            const message = new Device.Message(JSON.stringify(measurements));
+
+            if (timestamp) {
+                message.properties.add('iothub-creation-time-utc', timestamp);
+            }
+
+            await client.open();
+            context.log('[HTTP] Sending telemetry for device', device.deviceId);
+            await(client.sendEvent(message));
+            await client.close();    
         }
 
-        await util.promisify(client.open.bind(client))();
-        context.log('[HTTP] Sending telemetry for device', device.deviceId);
-        await util.promisify(client.sendEvent.bind(client))(message);
-        await util.promisify(client.close.bind(client))();
     } catch (e) {
         // If the device was deleted, we remove its cached connection string
         if (e.name === 'DeviceNotFoundError' && deviceCache[device.deviceId]) {
@@ -86,6 +110,13 @@ async function getDeviceConnectionString(context, device) {
     var symmetricKey = await getDeviceKey(context, deviceId);
     var provisioningSecurityClient = new SymmetricKeySecurityClient(deviceId, symmetricKey);
     var provisioningClient = ProvisioningDeviceClient.create(registrationHost, context.deviceEnrollments[deviceId].idScope, new ProvisioningTransport(), provisioningSecurityClient);
+    if(context.deviceEnrollments[deviceId].capabilityModelId) {
+        provisioningClient.setProvisioningPayload({
+            '__iot:interfaces': {
+              CapabilityModelId: context.deviceEnrollments[deviceId].capabilityModelId
+            }
+          });
+    }
 
     var registrationResult = await provisioningClient.register();
 

@@ -12,12 +12,29 @@ const app = express()
 const DEVICE_ENROLLMENTS_MAP = {
     "device010": {
         idScope: '0ne0005CF6C',
-        primaryKey: 'Ox0GtLJ+JgKnPMQwoV0XplA0j/+8m7k6ZRK2CU+U2Q0EBSpCDkjaaO5SonjL9ANCPuYR33Qpx5aYN8xPg32EgQ=='
+        primaryKey: 'Ox0GtLJ+JgKnPMQwoV0XplA0j/+8m7k6ZRK2CU+U2Q0EBSpCDkjaaO5SonjL9ANCPuYR33Qpx5aYN8xPg32EgQ==',
+        capabilityModelId: 'urn:seeedstudio:sensecap:1'
      },    
      "device020": {
-        idScope: '0ne0005CF6C',
-        primaryKey: 'Ox0GtLJ+JgKnPMQwoV0XplA0j/+8m7k6ZRK2CU+U2Q0EBSpCDkjaaO5SonjL9ANCPuYR33Qpx5aYN8xPg32EgQ=='
+        idScope: '0ne000B9296',
+        primaryKey: 'eVZTSWyO8th6hM4FyPQcobZEb6TYwob1Stwnhg5UIq1ldx8wwnJChbSPxq9c/yW1THz9ksXOJUKhDgkOMXR6uA=='
+     },
+     "device021": {
+        idScope: '0ne000B9296',
+        primaryKey: 'eVZTSWyO8th6hM4FyPQcobZEb6TYwob1Stwnhg5UIq1ldx8wwnJChbSPxq9c/yW1THz9ksXOJUKhDgkOMXR6uA==',
+        capabilityModelId: 'urn:seeedstudio:sensecap:1'
+     },
+     "device022": {
+        idScope: '0ne000B9296',
+        primaryKey: 'eVZTSWyO8th6hM4FyPQcobZEb6TYwob1Stwnhg5UIq1ldx8wwnJChbSPxq9c/yW1THz9ksXOJUKhDgkOMXR6uA==',
+        capabilityModelId: 'urn:seeedstudio:sensecap:1'
+     },
+     "device023": {
+        idScope: '0ne000B9296',
+        primaryKey: 'eVZTSWyO8th6hM4FyPQcobZEb6TYwob1Stwnhg5UIq1ldx8wwnJChbSPxq9c/yW1THz9ksXOJUKhDgkOMXR6uA==',
+        capabilityModelId: 'urn:seeedstudio:sensecap:1'
      }
+
 };
 
 app.use(express.json());

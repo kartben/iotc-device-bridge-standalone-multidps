@@ -3,12 +3,10 @@ content-type: application/json
 
 {
     "device": {
-        "deviceId": "device020"
+        "deviceId": "device010"
     },
     "measurements": {
-        "temp": 20.31,
-        "pressure": 50,
-        "humidity": 8.5,
-        "ledColor": "blue"
+        "temperature": 22.31,
+        "humidity": 18.5
     }
 }

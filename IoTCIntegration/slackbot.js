@@ -3,6 +3,9 @@ require('dotenv').config()
 const { App } = require("@slack/bolt");
 const payloads = require("./slackpayloads");
 
+const request = require('request')
+
+
 // Remix this project and add your own Slack app credentials to the environment
 const app = new App({
   token: process.env.SLACK_BOT_TOKEN,
@@ -49,7 +52,30 @@ app.action("url", async ({ ack }) => {
 // Use `callback_id` to listen to specific views by defining `callback_id` in your `view` definition
 // e.g. app.view('my_callback', ...)
 app.view(/w*/, async ({ ack, context, action, body }) => {
-  console.log(body.view.state)
+  if (body.view.state.values) {
+    values = body.view.state.values;
+    euid = values.euid.euid.value;
+    idscope = values.euid.euid.value;
+    key = values.key.key.value;
+
+    var enrollment = {}
+    enrollment[euid] = {
+      "idScope": idscope,
+      "primaryKey": key,
+      "capabilityModelId": "urn:seeedstudio:sensecap:1"
+    }
+
+    // add enrollment
+    request.post('http://localhost:3000/deviceEnrollments', {
+      json: enrollment
+    }, (err, res, body) => {
+    if (err) {
+        return console.log(err);
+      } else {
+        ack();
+      }
+    })
+  }
   ack();
 });
 
@@ -58,9 +84,6 @@ app.error(error => {
   console.error(error);
 });
 
-// Start your app
-(async () => {
-  await app.start(process.env.PORT || 3001);
-
-  console.log("⚡️ Bolt app is running!");
-})();
+module.exports = {
+  App: app
+}

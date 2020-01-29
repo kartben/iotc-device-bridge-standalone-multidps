@@ -9,31 +9,9 @@ const handleMessage = require('./lib/engine');
 const express = require('express')
 const app = express()
 
+const slackbotApp = require('./slackbot').App
+
 const DEVICE_ENROLLMENTS_MAP = {
-    "device010": {
-        idScope: '0ne0005CF6C',
-        primaryKey: 'Ox0GtLJ+JgKnPMQwoV0XplA0j/+8m7k6ZRK2CU+U2Q0EBSpCDkjaaO5SonjL9ANCPuYR33Qpx5aYN8xPg32EgQ==',
-        capabilityModelId: 'urn:seeedstudio:sensecap:1'
-     },    
-     "device020": {
-        idScope: '0ne000B9296',
-        primaryKey: 'eVZTSWyO8th6hM4FyPQcobZEb6TYwob1Stwnhg5UIq1ldx8wwnJChbSPxq9c/yW1THz9ksXOJUKhDgkOMXR6uA=='
-     },
-     "device021": {
-        idScope: '0ne000B9296',
-        primaryKey: 'eVZTSWyO8th6hM4FyPQcobZEb6TYwob1Stwnhg5UIq1ldx8wwnJChbSPxq9c/yW1THz9ksXOJUKhDgkOMXR6uA==',
-        capabilityModelId: 'urn:seeedstudio:sensecap:1'
-     },
-     "device022": {
-        idScope: '0ne000B9296',
-        primaryKey: 'eVZTSWyO8th6hM4FyPQcobZEb6TYwob1Stwnhg5UIq1ldx8wwnJChbSPxq9c/yW1THz9ksXOJUKhDgkOMXR6uA==',
-        capabilityModelId: 'urn:seeedstudio:sensecap:1'
-     },
-     "device023": {
-        idScope: '0ne000B9296',
-        primaryKey: 'eVZTSWyO8th6hM4FyPQcobZEb6TYwob1Stwnhg5UIq1ldx8wwnJChbSPxq9c/yW1THz9ksXOJUKhDgkOMXR6uA==',
-        capabilityModelId: 'urn:seeedstudio:sensecap:1'
-     }
 
 };
 
@@ -49,7 +27,7 @@ app.post('/', async (req, res) => {
 })
 
 app.get('/deviceEnrollments', async (req, res) => {
-    res.status(200).send(DEVICE_ENROLLMENTS_MAP);
+    res.status(200).json(DEVICE_ENROLLMENTS_MAP);
 })
 
 app.post('/deviceEnrollments', async (req, res) => {
@@ -58,5 +36,12 @@ app.post('/deviceEnrollments', async (req, res) => {
 })
   
 app.listen(3000, function () {
-    console.log('Example app listening on port 3000!')
-})
+    console.log('Device bridge listening on port 3000!')
+});
+
+// Start slackbot
+(async () => {
+    await slackbotApp.start(process.env.PORT || 3001);
+    console.log("⚡️ Bolt app is running!");
+  })();
+  

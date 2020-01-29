@@ -1,4 +1,7 @@
-POST http://localhost:3000
+//@server = localhost
+@server = 51.144.63.30
+
+POST http://{{server}}:3000
 Content-Type: application/json
 
 {
@@ -13,17 +16,17 @@ Content-Type: application/json
 
 ###
 
-GET http://localhost:3000/deviceEnrollments
+GET http://{{server}}:3000/deviceEnrollments
 
 ###
 
-POST http://localhost:3000/deviceEnrollments
+POST http://{{server}}:3000/deviceEnrollments
 Content-Type: application/json
 
 {
-    "deviceXXX": {
-        "idScope": "0ne000B9296",
-        "primaryKey": "eVZTSWyO8th6hM4FyPQcobZEb6TYwob1Stwnhg5UIq1ldx8wwnJChbSPxq9c/yW1THz9ksXOJUKhDgkOMXR6uA==",
+    "2cf7f12014700298": {
+        "idScope": "0ne000B688E",
+        "primaryKey": "+VXBA6/+nFWsgzxFvvF0cu4/IR0Gh/iNv/1vajQVEvWDTFIu9TAnv+fP9MaM9T2TbtcUWngiObk3xYBq546u5w==",
         "capabilityModelId": "urn:seeedstudio:sensecap:1"
-    }
+  }
 }

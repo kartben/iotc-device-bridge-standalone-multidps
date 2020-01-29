@@ -18,6 +18,16 @@ const DEVICE_ENROLLMENTS_MAP = {
 app.use(express.json());
 app.post('/', async (req, res) => {
     try {
+        console.log("[HTTP] Received the following body:", req.body)
+
+        // adjust for getting TTNv3 metadata 
+        req.body = {
+            device: {
+                deviceId: req.body.end_device_ids.device_id.toLowerCase()
+            },
+            measurements: req.body.uplink_message.decoded_payload
+        }
+
         await handleMessage({ deviceEnrollments: DEVICE_ENROLLMENTS_MAP, log: console.log }, req.body.device, req.body.measurements, req.body.timestamp);
         res.status(200).end();
     } catch (e) {

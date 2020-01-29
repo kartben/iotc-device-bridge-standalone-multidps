@@ -55,7 +55,7 @@ app.view(/w*/, async ({ ack, context, action, body }) => {
   if (body.view.state.values) {
     values = body.view.state.values;
     euid = values.euid.euid.value;
-    idscope = values.euid.euid.value;
+    idscope = values.idscope.idscope.value;
     key = values.key.key.value;
 
     var enrollment = {}

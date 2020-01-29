@@ -34,6 +34,10 @@ module.exports = async function (context, device, measurements, timestamp) {
         if (!device.deviceId || !/^[a-z0-9\-]+$/.test(device.deviceId)) {
             throw new StatusError('Invalid format: deviceId must be alphanumeric, lowercase, and may contain hyphens.', 400);
         }
+
+        if(!context.deviceEnrollments[device.deviceId]) {
+            throw new StatusError('No enrollment mapping found for this device', 400);    
+        }
     } else {
         throw new StatusError('Invalid format: a device specification must be provided.', 400);
     }

@@ -3,13 +3,10 @@
  * Licensed under the MIT License.
  */
 
-const request = require('request-promise-native');
 const handleMessage = require('./lib/engine');
 
 const express = require('express')
 const app = express()
-
-const slackbotApp = require('./slackbot').App
 
 const DEVICE_ENROLLMENTS_MAP = {
 
@@ -49,9 +46,12 @@ app.listen(3000, function () {
     console.log('Device bridge listening on port 3000!')
 });
 
+if (process.env.SLACK_BOT_TOKEN) {
+    const slackbotApp = require('./slackbot').App
+
 // Start slackbot
 (async () => {
     await slackbotApp.start(process.env.PORT || 3001);
-    console.log("⚡️ Bolt app is running!");
+        console.log("⚡️ Slack bot is running!");
   })();
-  
+}

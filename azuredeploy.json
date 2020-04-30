@@ -1,137 +1,154 @@
 {
-    "$schema": "https://schema.management.azure.com/schemas/2015-01-01/deploymentTemplate.json#",
+    "$schema": "https://schema.management.azure.com/schemas/2019-04-01/deploymentTemplate.json#",
     "contentVersion": "1.0.0.0",
     "parameters": {
-        "scopeID": {
-            "type": "String"
-        },
-        "iotCentralSASKey": {
-            "type": "String"
+      "containergroupname": {
+        "type": "string",
+        "metadata": {
+          "description": "Name for the container group"
         }
+      },
+      "containername": {
+        "type": "string",
+        "metadata": {
+          "description": "Name for the container"
+        },
+        "defaultValue": "iotc-ttn-bridge"
+      },
+      "imagename": {
+        "type": "string",
+        "metadata": {
+          "description": "Name for the image"
+        },
+        "defaultValue": "kartben/iotcdevicebridgestandalonemultidps:latest"
+      },
+      "restApiPort": {
+        "type": "string",
+        "metadata": {
+          "description": "TCP port to open on the container and the public IP address (REST API)"
+        },
+        "defaultValue": "3000"
+      },
+      "slackBotPort": {
+        "type": "string",
+        "metadata": {
+          "description": "TCP port to open on the container and the public IP address (REST API)"
+        },
+        "defaultValue": "3001"
+      },
+      "cpuCores": {
+        "type": "string",
+        "metadata": {
+          "description": "The number of CPU cores to allocate to the container."
+        },
+        "defaultValue": "1.0"
+      },
+      "memoryInGB": {
+        "type": "string",
+        "metadata": {
+          "description": "The amount of memory to allocate to the container in gigabytes."
+        },
+        "defaultValue": "1.0"
+      },
+      "slackBotToken": {
+        "type": "string",
+        "metadata": {
+          "description": "[Optional] Slack Bot User OAuth Access Token."
+        }
+      },
+      "slackSigningSecret": {
+        "type": "string",
+        "metadata": {
+          "description": "[Optional] Slack bot signing secret."
+        }
+      },
+      "location": {
+        "type": "string",
+        "defaultValue": "West US 2",
+        "allowedValues": [
+            "West US",
+            "East US",
+            "West Europe",
+            "West US 2",
+            "North Europe",
+            "Central US EUAP",
+            "East US 2 EUAP",
+            "Southeast Asia",
+            "East US 2",
+            "Central US",
+            "Australia East",
+            "UK South"
+        ],
+        "metadata": {
+          "description": "The location in which the resources will be created."
+        }
+      }
     },
-    "variables": {
-        "planName": "[concat('iotc-pln', uniqueString(resourceGroup().id))]",
-        "storageName": "[concat('iotcsa', uniqueString(resourceGroup().id))]",
-        "functionAppName": "[concat('iotc-fn', uniqueString(resourceGroup().id))]",
-        "keyVaultName": "[concat('iotcvlt', uniqueString(resourceGroup().id))]",
-        "iotcKeyName": "iotckey"
-    },
+    "variables": {},
     "resources": [
-        {
-            "type": "Microsoft.Storage/storageAccounts",
-            "sku": {
-                "name": "Standard_LRS",
-                "tier": "Standard"
-            },
-            "kind": "Storage",
-            "name": "[variables('storageName')]",
-            "apiVersion": "2018-07-01",
-            "location": "[resourceGroup().location]"
-        },
-        {
-            "type": "Microsoft.Web/serverfarms",
-            "apiVersion": "2015-04-01",
-            "name": "[variables('planName')]",
-            "location": "[resourceGroup().location]",
-            "properties": {
-              "name": "[variables('planName')]",
-              "computeMode": "Dynamic",
-              "sku": "Dynamic"
-            }
-        },
-        {
-            "type": "Microsoft.Web/sites",
-            "kind": "functionapp",
-            "name": "[variables('functionAppName')]",
-            "apiVersion": "2016-08-01",
-            "location": "[resourceGroup().location]",
-            "tags": {
-                "iotCentral": "device-bridge",
-                "iotCentralDeviceBridge": "function-app"
-            },
-            "identity": {
-                "type": "SystemAssigned"
-            },
-            "properties": {
-                "enabled": true,
-                "serverFarmId": "[resourceId('Microsoft.Web/serverfarms', variables('planName'))]",
-                "siteConfig": {
-                    "appSettings": [
-                        { "name": "AzureWebJobsDashboard", "value": "[concat('DefaultEndpointsProtocol=https;AccountName=',variables('storageName'),';AccountKey=',listKeys(resourceId('Microsoft.Storage/storageAccounts', variables('storageName')), '2015-05-01-preview').key1)]" },
-                        { "name": "AzureWebJobsStorage", "value": "[concat('DefaultEndpointsProtocol=https;AccountName=',variables('storageName'),';AccountKey=',listKeys(resourceId('Microsoft.Storage/storageAccounts', variables('storageName')), '2015-05-01-preview').key1)]" },
-                        { "name": "WEBSITE_CONTENTAZUREFILECONNECTIONSTRING", "value": "[concat('DefaultEndpointsProtocol=https;AccountName=',variables('storageName'),';AccountKey=',listKeys(resourceId('Microsoft.Storage/storageAccounts', variables('storageName')), '2015-05-01-preview').key1)]" },
-                        { "name": "WEBSITE_CONTENTSHARE", "value": "[toLower(variables('functionAppName'))]" },
-                        { "name": "FUNCTIONS_EXTENSION_VERSION", "value": "~2" },
-                        { "name": "WEBSITE_NODE_DEFAULT_VERSION", "value": "8.4.0" },
-                        { "name": "WEBSITE_HTTPSCALEV2_ENABLED", "value": 0 },
-                        { "name": "ID_SCOPE", "value": "[parameters('scopeID')]" },
-                        { "name": "IOTC_KEY_URL", "value": "[concat('https://', variables('keyVaultName'), '.vault.azure.net/secrets/', variables('iotcKeyName'), '/')]" }
-                    ]
-                }
-            },
-            "resources": [
-                {
-                    "name": "MSDeploy",
-                    "type": "Extensions",
-                    "location": "[resourceGroup().location]",
-                    "apiVersion": "2015-08-01",
-                    "dependsOn": [
-                        "[concat('Microsoft.Web/sites/', variables('functionAppName'))]"
-                    ],
-                    "properties": {
-                        "packageUri": "https://raw.githubusercontent.com/Azure/iotc-device-bridge/master/iotc-bridge-az-function.zip"
-                    }
-                }
-            ],
-            "dependsOn": [
-                "[resourceId('Microsoft.Storage/storageAccounts', variables('storageName'))]",
-                "[resourceId('Microsoft.Web/serverfarms', variables('planName'))]"
-            ]
-        },
-        {
-            "type": "Microsoft.KeyVault/vaults",
-            "name": "[variables('keyVaultName')]",
-            "apiVersion": "2016-10-01",
-            "location": "[resourceGroup().location]",
-            "properties": {
-                "sku": {
-                    "family": "A",
-                    "name": "Standard"
+      {
+        "name": "[parameters('containergroupname')]",
+        "type": "Microsoft.ContainerInstance/containerGroups",
+        "apiVersion": "2018-06-01",
+        "location": "[parameters('location')]",
+        "dependsOn": [],
+        "properties": {
+          "containers": [
+            {
+              "name": "[parameters('containername')]",
+              "properties": {
+                "command": [],
+                "image": "[parameters('imagename')]",
+                "ports": [
+                  {
+                    "protocol": "Tcp",
+                    "port": "[parameters('restApiPort')]"
+                  },
+                  {
+                    "protocol": "Tcp",
+                    "port": "[parameters('slackBotPort')]"
+                  }
+                ],
+                "resources": {
+                  "requests": {
+                    "cpu": "[parameters('cpuCores')]",
+                    "memoryInGB": "[parameters('memoryInGB')]"
+                  }
                 },
-                "tenantId": "[subscription().tenantId]",
-                "accessPolicies": [
-                    {
-                        "tenantId": "[reference(concat('Microsoft.Web/sites/', variables('functionAppName')), '2016-08-01', 'Full').identity.tenantId]",
-                        "objectId": "[reference(concat('Microsoft.Web/sites/', variables('functionAppName')), '2016-08-01', 'Full').identity.principalId]",
-                        "permissions": {
-                            "keys": [],
-                            "secrets": [
-                                "Get",
-                                "List",
-                                "Recover"
-                            ],
-                            "certificates": []
-                        }
-                    }
+                "environmentVariables": [
+                  {
+                    "name": "SLACK_BOT_TOKEN",
+                    "secureValue": "[parameters('slackBotToken')]"
+                  },
+                  {
+                    "name": "SLACK_SIGNING_SECRET",
+                    "secureValue": "[parameters('slackSigningSecret')]"
+                  }
                 ]
-            },
-            "resources": [
-                {
-                    "type": "secrets",
-                    "name": "[variables('iotcKeyName')]",
-                    "apiVersion": "2015-06-01",
-                    "tags": {},
-                    "properties": {
-                        "value": "[parameters('iotCentralSASKey')]"
-                    },
-                    "dependsOn": [
-                        "[concat('Microsoft.KeyVault/vaults/', variables('keyVaultName'))]"
-                    ]
-                }
-            ],
-            "dependsOn": [
-                "[resourceId('Microsoft.Web/sites', variables('functionAppName'))]"
+              }
+            }
+          ],
+          "osType": "Linux",
+          "ipAddress": {
+            "type": "Public",
+            "ports": [
+              {
+                "protocol": "Tcp",
+                "port": "[parameters('restApiPort')]"
+              },
+              {
+                "protocol": "Tcp",
+                "port": "[parameters('slackBotPort')]"
+              }
             ]
+          }
         }
-    ]
-}
+      }
+    ],
+    "outputs": {
+      "containerIPv4Address": {
+        "type": "string",
+        "value": "[reference(resourceId('Microsoft.ContainerInstance/containerGroups/', parameters('containergroupname'))).ipAddress.ip]"
+      }
+    }
+  }

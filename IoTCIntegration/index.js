@@ -2,6 +2,7 @@
  * Copyright (c) Microsoft Corporation. All rights reserved.
  * Licensed under the MIT License.
  */
+require('dotenv').config()
 
 const handleMessage = require('./lib/engine');
 
@@ -9,7 +10,13 @@ const express = require('express')
 const app = express()
 
 const DEVICE_ENROLLMENTS_MAP = {
-
+    // you may pre-populate this list with some existing DPS enrollements, ex:
+    //
+    // "2CF7F12010700028": {
+    //   "idScope": "0ne000B89D7",
+    //   "primaryKey": "4nUUafbKnOwX/JsjZ2nUU11bH+fHfd98oRx2yN9N5bY42yRfs+oA/cIT5clo2SvJz79NGTYvCXu6JFlc7BA0pg==",
+    //   "capabilityModelId": "urn:seeedstudio:sensecap:1"
+    // }
 };
 
 app.use(express.json());
@@ -43,15 +50,15 @@ app.post('/deviceEnrollments', async (req, res) => {
 })
   
 app.listen(3000, function () {
-    console.log('Device bridge listening on port 3000!')
+    console.log('Device bridge API gateway listening on port 3000')
 });
 
 if (process.env.SLACK_BOT_TOKEN) {
-    const slackbotApp = require('./slackbot').App
-
-// Start slackbot
-(async () => {
-    await slackbotApp.start(process.env.PORT || 3001);
+    const slackbotApp = require('./slackbot').App;
+    
+    // Start slackbot
+    (async () => {
+        await slackbotApp.start(process.env.PORT || 3001);
         console.log("⚡️ Slack bot is running!");
-  })();
+      })();
 }

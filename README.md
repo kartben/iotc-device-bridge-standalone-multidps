@@ -21,6 +21,27 @@ To use the device bridge solution, you will need the following:
 [![Deploy to Azure](https://azuredeploy.net/deploybutton.png)](https://portal.azure.com/#create/Microsoft.Template/uri/https%3A%2F%2Fraw.githubusercontent.com%2Fkartben%2Fiotc-device-bridge-standalone-multidps%2Fmaster%2Fazuredeploy.json)
 
 
+Once running, the bridge exposes a REST API for easily listing/adding mappings between a TTN devices and Azure IoT, by providing:
+
+* the EUID of the LoRaWAN device for which you want telemetry to be forwarded to IoT Central
+* the ID Scope for the Azure IoT DPS instance used to manage your devices, and in which you have already created a group enrollment
+* the symmetric key for your group enrollment (if using IoT Central, this would be available in Administration / Device Connection / View keys)
+* optionally: the PnP capability model ID that you want to associate to this device. 
+  * Note: this bridge currently only supports "urn:seeedstudio:sensecap:1" which corresponds to a SeeedStudio Temperature+Humidity SenseCap device.
+
+In practice, you would issue a POST similar to the following:
+
+```
+POST http://<yourbridge>:3000/deviceEnrollments
+
+ "2CF7F12010700028": {
+   "idScope": "0ne000B89D7",
+   "primaryKey": "4nUUafbKnOwX/JsjZ2nUU11bH+fHfd98oRx2yN9N5bY42yRfs+oA/cIT5clo2SvJz79NGTYvCXu6JFlc7BA0pg==",
+   "capabilityModelId": "urn:seeedstudio:sensecap:1"
+ }
+```
+
+
 # Contributing
 
 This project welcomes contributions and suggestions.  Most contributions require you to agree to a

@@ -3,9 +3,11 @@
 NOTE: This repository was initially created as a fork of https://github.com/Azure/iotc-device-bridge, as a way to address the requirements of bridging a LoRaWAN network server to IoT Central (or potentially IoT Hub) more easily. 
 
 The main differences/evolutions with regard to the original IoT Central Device Bridge are highlighted below:
-- Runs as a full-blown Node.js application (instead of Azure functions), conveniently made available as a container. 
-- Allows to bridge to multiple IoT Central applications (or more generally, multiple DPS Group Enrollments). Provides a per-device mapping device right --> IoT Central application ;
-- Optionally: can be configured as a Slack bot which allows to interactively configure new mappings between a device EUI and a DPS group enrollment (in practice, and for most folks, this means a particular IoT Central app).
+- Runs as a full-blown Node.js application (instead of Azure functions), conveniently made available as a container. It simplifies the implementation of downlink support (which is still to be implemented though!), and makes it easier to persist
+- Allows to bridge to multiple IoT Central applications (or more generally, multiple DPS Group Enrollments), with a configurable per-device mapping ;
+- Optionally: can be configured as a Slack bot which allows to interactively configure new mappings between a device EUI and a DPS group enrollment (which can of course be an IoT Central application's group enrollment).
+
+Note: switching from an Azure Function based architecture + Consumption Plan to a Node.js app was done mainly to 
 
 You may want to refer to the [documentation of the original bridge](https://github.com/Azure/iotc-device-bridge/blob/master/README.md).
 
@@ -13,11 +15,10 @@ You may want to refer to the [documentation of the original bridge](https://gith
 
 To use the device bridge solution, you will need the following:
 - an Azure account. You can create a free Azure account from [here](https://aka.ms/aft-iot)
-- an Azure IoT Central application to connect the devices. Create a free app by following [these instructions](https://docs.microsoft.com/en-us/azure/iot-central/quick-deploy-iot-central)
+- an Azure IoT Central application to connect the devices to. Create a free app by following [these instructions](https://docs.microsoft.com/en-us/azure/iot-central/quick-deploy-iot-central)
+  - Note: you can also go for an Azure IoT DPS + Azure IoT Hub setup
 
 [![Deploy to Azure](https://azuredeploy.net/deploybutton.png)](https://portal.azure.com/#create/Microsoft.Template/uri/https%3A%2F%2Fraw.githubusercontent.com%2Fkartben%2Fiotc-device-bridge-standalone-multidps%2Fmaster%2Fazuredeploy.json)
-
-XXX TODO
 
 
 # Contributing
